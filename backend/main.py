@@ -7,7 +7,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZIPMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.settings import settings
@@ -60,7 +60,7 @@ app.add_middleware(
 
 # Middleware - Compressão
 app.add_middleware(
-    GZIPMiddleware,
+    GZipMiddleware,
     minimum_size=1000,
 )
 
@@ -70,6 +70,14 @@ app.add_middleware(ErrorHandlingMiddleware)
 # Middleware - Autenticação JWT
 app.add_middleware(AuthMiddleware)
 
+
+@app.get("/")
+async def root():
+    return {
+        "service": "jira-report-backend",
+        "status": "running",
+        "environment": settings.ENVIRONMENT
+    }
 
 # Health check
 @app.get("/health", tags=["health"])

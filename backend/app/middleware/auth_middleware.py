@@ -24,10 +24,21 @@ class AuthMiddleware(BaseHTTPMiddleware):
     - /openapi.json
     """
     
-    EXCLUDED_PATHS = {"/health", "/ready", "/docs", "/openapi.json"}
-    
+    # EXCLUDED_PATHS = {"/health", "/ready", "/docs", "/openapi.json"}
+    EXCLUDED_PATHS = {
+    "/",
+    "/health",
+    "/ready",
+    "/docs",
+    "/openapi.json",
+    "/favicon.ico",
+    "/redoc"
+}
     async def dispatch(self, request: Request, call_next):
         """Intercepta e valida requisição."""
+        
+        if request.method == "OPTIONS":
+            return await call_next(request)
         
         # Pular validação para endpoints excludentes
         if request.url.path in self.EXCLUDED_PATHS:

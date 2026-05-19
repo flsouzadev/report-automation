@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Processando...</title>
+
+  <!-- Google Fonts e Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f4f6f9;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem 2.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+      color: #17a2b8;
+      margin-bottom: 1.2rem;
+    }
+
+    #status-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    #final-link {
+      display: none;
+      margin-top: 1.5rem;
+    }
+
+    .success {
+      color: #28a745;
+    }
+
+    .error {
+      color: #dc3545;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="status-card">
+    <div class="spinner-border" role="status" id="spinner">
+      <span class="sr-only">Carregando...</span>
+    </div>
+    <p id="status-text">Iniciando processo...</p>
+    <a href="#" id="final-link" target="_blank" class="btn btn-success btn-block">📄 Abrir Relatório</a>
+  </div>
+
+  <script>
+    let pollingInterval;
+
+    document.addEventListener("DOMContentLoaded", function () {
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .executarProcessoCompleto();
+
+      pollingInterval = setInterval(getUpdate, 1500);
+    });
+
+    function getUpdate() {
+      google.script.run.withSuccessHandler(updateStatusText).obterStatusAtual();
+    }
+
+    function updateStatusText(status) {
+      const statusElement = document.getElementById('status-text');
+      if (status && status !== 'null' && statusElement.textContent !== status) {
+        statusElement.textContent = status;
+
+        if (status === 'SUCESSO' || status === 'ERRO') {
+          clearInterval(pollingInterval);
+        }
+      }
+    }
+
+    function onSuccess(finalMessage) {
+      clearInterval(pollingInterval);
+      document.getElementById('spinner').style.display = 'none';
+
+      const parts = finalMessage.split('URL: ');
+      const statusElement = document.getElementById('status-text');
+      statusElement.textContent = '✅ ' + parts[0];
+      statusElement.classList.add('success');
+
+      if (parts.length > 1) {
+        const linkElement = document.getElementById('final-link');
+        linkElement.href = parts[1];
+        linkElement.style.display = 'block';
+      }
+
+      setTimeout(google.script.host.close, 15000);
+    }
+
+    function onFailure(error) {
+      clearInterval(pollingInterval);
+      document.getElementById('spinner').style.display = 'none';
+      const statusElement = document.getElementById('status-text');
+      statusElement.textContent = '❌ Erro: ' + error.message;
+      statusElement.classList.add('error');
+    }
+  </script>
+</body>
+
+</html>

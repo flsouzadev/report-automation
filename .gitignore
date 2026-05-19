@@ -73,3 +73,4 @@ google_key.json
 # Node (para clasp)
 node_modules/
 .node-version
+.clasp.json
