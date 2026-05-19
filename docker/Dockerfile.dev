@@ -1,0 +1,30 @@
+# Dockerfile.dev
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Instala dependências
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    chromium-browser \
+    chromium-codecs-ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copia requirements
+COPY requirements.txt .
+
+# Instala Python packages
+RUN pip install -r requirements.txt
+
+# Copia código
+COPY backend/ /app/
+
+# Cria .env se não existir
+RUN test -f .env || echo "ENVIRONMENT=development" > .env
+
+# Port
+EXPOSE 8000
+
+# CMD: Rodando com reload para desenvolvimento
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
