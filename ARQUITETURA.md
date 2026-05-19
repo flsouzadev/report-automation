@@ -1734,10 +1734,10 @@ class ReportService:
 ```python
 # main.py
 
-from fastapi.middleware.gzip import GZIPMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 app.add_middleware(
-    GZIPMiddleware,
+    GZipMiddleware,
     minimum_size=1000,  # Comprime respostas > 1KB
     compression_level=6  # Nível 1-9 (9 = máxima compressão, mais lento)
 )
