@@ -1,0 +1,6 @@
+#!/home/flsouza/projetos-cpqd/sdi/automacao-sdi-relatorios/upgrade-automacao-relatorio/.venv/bin/python
+import sys
+from watchfiles.cli import cli
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(cli())
